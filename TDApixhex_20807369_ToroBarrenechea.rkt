@@ -6,3 +6,5 @@
       (error "No has ingreado un hexadecimal")
       )
   )
+
+(provide (all-defined-out))

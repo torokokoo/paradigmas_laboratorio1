@@ -13,3 +13,5 @@
       (error "Los valores ingresados deben ser entre 0 y 255")
       )
   )
+
+(provide (all-defined-out))

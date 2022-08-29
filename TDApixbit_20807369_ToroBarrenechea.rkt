@@ -12,3 +12,7 @@
       (error "No has ingresado un bit")
       )
   )
+
+
+; Exportar las funciones del TDA
+(provide (all-defined-out))
