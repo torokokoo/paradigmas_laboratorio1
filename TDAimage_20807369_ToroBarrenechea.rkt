@@ -14,17 +14,30 @@
 ; Aqui solo se revisa el primer item, se confia en que se ingresaron todos los pixeles del mismo tipo.
 (define image
   (lambda (width height . pixels)
-    pixels
-    (if (bit? (car(cdr(cdr(car pixels)))))
-        (list width height "pixbit" pixels)
-        (list width height "falso" pixels)
-    )
+    (list width height pixels)
   )
   )
 
+(define (recursion list status)
+  (if (not (null? list))
+    (if (and (bit? (list-ref (car list) 2)) (= (length (car list)) 4))
+      (recursion (cdr list) #t)
+      #f
+    )
+    status
+  )
+)
+
 (define (bitmap? image)
-  (if (eq? (car(cdr(cdr image))) "pixbit")
-      #t
+      (if (= (length image) 3)
+        (if (not (null? (list-ref image 2)))
+          (recursion (list-ref image 2) #t)
+          #f
+        )
       #f
       )
   )
+
+
+; Exportar las funciones del TDA
+(provide (all-defined-out))
