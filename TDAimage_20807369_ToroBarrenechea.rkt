@@ -6,38 +6,23 @@
 ;|                 TDA IMAGE                  |            
 ;+--------------------------------------------+
 
-; Se crea el constructor de image
+;+------------- REPRESENTACION---------------+
+; Este TDA corresponde a una Image, donde se guarda el ancho, el alto y una lista de los pixeles que la constituyen,
+; esto es guardado en una lista siguiendo el mismo orden especificado anteriormente.
+; (number X number x [pixbit-d|pixrgb-d|pixhex-d]) donde [] representa una lista.
+
+;+------------- CONSTRUCTORES ---------------+
 
 ; Dom: width (int), height (int), pixmap (lista de pixbit-d|pixrgb-d|pixhex-d)
-; Rec: Una lista que contiene la altura, el ancho y los pixeles respectivamente
-; Descripcion: 
-; Aqui solo se revisa el primer item, se confia en que se ingresaron todos los pixeles del mismo tipo.
+; Rec: Una imagen de tipo image (lista)
+; Descripcion: Crea una imagen con el tamano y los pixeles especificados
+; Recursion: No se usa
+; TODO: Revisar que se ingresen los mismos tipos de pixeles
 (define image
   (lambda (width height . pixels)
     (list width height pixels)
   )
   )
-
-(define (recursion list status)
-  (if (not (null? list))
-    (if (and (bit? (list-ref (car list) 2)) (= (length (car list)) 4))
-      (recursion (cdr list) #t)
-      #f
-    )
-    status
-  )
-)
-
-(define (bitmap? image)
-      (if (= (length image) 3)
-        (if (not (null? (list-ref image 2)))
-          (recursion (list-ref image 2) #t)
-          #f
-        )
-      #f
-      )
-  )
-
-
+  
 ; Exportar las funciones del TDA
 (provide (all-defined-out))

@@ -17,7 +17,7 @@
 ; Descripcion: Crea un pixbit en la ubicacion especificada (x, y) con el valor (bit) y profundidad (d) indicados.
 ; Recursion: No se usa
 (define (pixbit-d x y bit d)
-  (if (or (bit? bit) (number? x) (number? y) (number? d))
+  (if (and (bit? bit) (number? x) (number? y) (number? d))
       (list x y bit d)
       (error "Los valores ingresados no son del tipo correcto")
       )
@@ -44,7 +44,7 @@
 (define (bitmap? image)
       (if (= (length image) 3)
         (if (not (null? (list-ref image 2)))
-          (recursion (list-ref image 2) #t)
+          (recursion-bit (list-ref image 2) #t)
           #f
         )
       #f
@@ -58,10 +58,10 @@
 ;bitmap? accede a los pixeles de la imagen y llama por primera vez a la recursion. Se tienen que cumplir que
 ;sea de un tipo bit, y que el pixmap tenga solamente 4 elementos (para que no se confunda con un pixrgb-d)
 ;Recursion: De cola
-(define (recursion list status)
+(define (recursion-bit list status)
   (if (not (null? list))
     (if (and (bit? (list-ref (car list) 2)) (= (length (car list)) 4))
-      (recursion (cdr list) #t)
+      (recursion-bit (cdr list) #t)
       #f
     )
     status
