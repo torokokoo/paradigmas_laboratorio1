@@ -67,4 +67,5 @@
   )
 )
 
+; Exportar las funciones del TDA
 (provide (all-defined-out))

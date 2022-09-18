@@ -31,7 +31,7 @@
 ; Descripcion: Revisa si el valor ingresado es un bit (0 o 1)
 ; Recursion: No se usa
 (define (bit? b)
-  (if (or (= b 0) (= b 1))
+  (if (and (number? b) (or (= b 0) (= b 1)))
       #t
       #f)
   )
