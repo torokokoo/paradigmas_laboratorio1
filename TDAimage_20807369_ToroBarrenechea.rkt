@@ -63,7 +63,48 @@
 )
   
 ;+------------- OTRAS FUNCIONES ---------------+
-(define (flipH image)
+;Dom: image (image)
+;Rec: image (image)
+;Desc: Toma una imagen y le aplica llamados recursivos para modificar los valores del eje X e invertirlos
+;Recursion: No se usa
+;NOTA: No se puede usar el constructor (image) debido a que (recursion-fliph) retorna una lista, y si se usa el
+;      constructor el resultado seria (width height ((pixmaps))), o sea, dos listas envuelven a pixmaps en vez de una 
+(define (flipH img)
+  (list (getWidth img) (getHeight img) (recursion-fliph (third img) (getWidth img)))
+)
+
+;Dom: pixels (list), width (number)
+;Rec: pixels (list)
+;Desc: Usando la funcion list-set invierte el valor de la ubicacion del eje X, para que se cree el efecto espejo horizontalmente
+;      se llama nuevamente para que vaya modificando los siguientes elementos y con la funcion append se agregan.
+;Recursion: Natural
+(define (recursion-fliph pixels width)
+  (if (not (null? (cdr pixels)))
+    (append (list (list-set (car pixels) 0 (+ (- width (caar pixels)) 1))) (recursion-fliph (cdr pixels) width))
+    (list (list-set (car pixels) 0 (+ (- width (caar pixels)) 1)))
+  )
+)
+
+;Dom: image (image)
+;Rec: image (image)
+;Desc: Toma una imagen y le aplica llamados recursivos para modificar los valores del eje Y e invertirlos
+;Recursion: No se usa
+;NOTA: No se puede usar el constructor (image) debido a que (recursion-flipv) retorna una lista, y si se usa el
+;      constructor el resultado seria (width height ((pixmaps))), o sea, dos listas envuelven a pixmaps en vez de una 
+(define (flipV img)
+  (list (getWidth img) (getHeight img) (recursion-flipv (third img) (getHeight img)))
+)
+
+;Dom: pixels (list), height (number)
+;Rec: pixels (list)
+;Desc: Usando la funcion list-set invierte el valor de la ubicacion del eje Y, para que se cree el efecto espejo verticalmente
+;      se llama nuevamente para que vaya modificando los siguientes elementos y con la funcion append se agregan.
+;Recursion: Natural
+(define (recursion-flipv pixels height)
+  (if (not (null? (cdr pixels)))
+    (append (list (list-set (car pixels) 1 (+ (- height (cadar pixels)) 1))) (recursion-flipv (cdr pixels) height))
+    (list (list-set (car pixels) 1 (+ (- height (cadar pixels)) 1)))
+  )
 )
 
 ; Exportar las funciones del TDA
