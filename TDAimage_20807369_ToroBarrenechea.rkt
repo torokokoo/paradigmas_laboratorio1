@@ -107,5 +107,35 @@
   )
 )
 
+(define (crop img x1 x2 y1 y2)
+  (if (and (image? img) (number? x1) (number? x2) (number? y1) (number? y2))
+    (list (getWidth img) (getHeight img) (recursion-crop (third img) x1 x2 y1 y2))
+    (error "Los valores ingresados no son del tipo correcto")
+  )
+)
+
+(define (recursion-crop pixels x1 x2 y1 y2)
+  (if (not (null? (cdr pixels)))
+    (if (and 
+          (>= (max x1 x2) (caar pixels))
+          (<= (min x1 x2) (caar pixels))
+          (>= (max y1 y2) (cadar pixels))
+          (<= (min y1 y2) (cadar pixels))
+        )
+        (append (list (car pixels)) (recursion-crop (cdr pixels) x1 x2 y1 y2))
+        (append (list) (recursion-crop (cdr pixels) x1 x2 y1 y2))
+    )
+    (if (and 
+          (>= (max x1 x2) (caar pixels))
+          (<= (min x1 x2) (caar pixels))
+          (>= (max y1 y2) (cadar pixels))
+          (<= (min y1 y2) (cadar pixels))
+        )
+        (list (car pixels))
+        (list)
+    )
+  )
+)
+
 ; Exportar las funciones del TDA
 (provide (all-defined-out))
