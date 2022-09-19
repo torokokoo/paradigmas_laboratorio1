@@ -21,6 +21,25 @@
       )
   )
 
+;+------------- SELECTORES ---------------+
+
+; Dom: pixrgb (pixrgb-d)
+; Rec: rgb
+; Desc: Extrae el valor rojo de un pixrgb-d
+; Recursion: No se usa
+(define (getR pixrgb) (third pixrgb))
+
+; Dom: pixrgb (pixrgb-d)
+; Rec: rgb
+; Desc: Extrae el valor verde de un pixrgb-d
+; Recursion: No se usa
+(define (getG pixrgb) (fourth pixrgb))
+
+; Dom: pixrgb (pixrgb-d)
+; Rec: rgb
+; Desc: Extrae el valor azul de un pixrgb-d
+; Recursion: No se usa
+(define (getB pixrgb) (fifth pixrgb))
 ;+------------- PERTENENCIA ---------------+
 
 ; Dom: b (int)
