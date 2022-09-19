@@ -3,7 +3,6 @@
 (require "TDApixbit_20807369_ToroBarrenechea.rkt")
 (require "TDApixrgb_20807369_ToroBarrenechea.rkt")
 (require "TDApixhex_20807369_ToroBarrenechea.rkt")
-(require "TDAhistogram_20807369_ToroBarrenechea.rkt")
 
 ;+--------------------------------------------+            
 ;|                 TDA IMAGE                  |            
@@ -111,6 +110,15 @@
   )
 )
 
+;Dom: image (image)
+;Rec: image (image)
+;Desc: Toma una imagen y le aplica llamados recursivos para modificar los valores del eje X e Y realizando una rotacion en 90 grados.
+;Recursion: No se usa
+;NOTA: No se puede usar el constructor (image) debido a que (recursion-fliph) retorna una lista, y si se usa el
+;      constructor el resultado seria (width height ((pixmaps))), o sea, dos listas envuelven a pixmaps en vez de una 
+(define (flip90 img)
+  (list (getWidth img) (getHeight img) (recursion-flip90 (third img) (getWidth img)))
+)
 ;+------------- OTRAS FUNCIONES ---------------+
 
 ;Dom: pixels (list), width (number)
@@ -197,5 +205,17 @@
   )
 )
 
+;Dom: pixels (list)
+;Rec: pixels (list)
+;Desc: Realiza una rotacion en 90 grados respecto al origen imaginando un plano cartesiano, o sea (x, y) -> (y, -x)
+;      y le aplica una traslacion (0, width) para que el punto inferior izquierdo sea (1,1) y no un negativo
+;      se llama nuevamente para que vaya modificando los siguientes elementos y con la funcion append se agregan.
+;Recursion: Natural
+(define (recursion-flip90 pixels width)
+  (if (not (null? (cdr pixels)))
+    (append (list (append (list (second (car pixels)) (+ (* (first (car pixels)) -1) width 1)) (cddar pixels))) (recursion-flip90 (cdr pixels) width))
+    (list (append (list (second (car pixels)) (+ (* (first (car pixels)) -1) width 1)) (cddar pixels)))
+  )
+)
 ; Exportar las funciones del TDA
 (provide (all-defined-out))
