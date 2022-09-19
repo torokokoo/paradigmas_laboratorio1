@@ -32,8 +32,16 @@
 ; Recursion: No se usa
 ; FALTA TRABAJARLA
 (define (hex? hex)
-  (string? hex)
-  )
+  (and
+        (= (string-length hex) 6)
+        (not (not (member (substring hex 0 1) (list "0" "1" "2" "3" "4" "5" "6" "7" "8" "9" "A" "B" "C" "D" "E" "F"))))
+        (not (not (member (substring hex 1 2) (list "0" "1" "2" "3" "4" "5" "6" "7" "8" "9" "A" "B" "C" "D" "E" "F"))))
+        (not (not (member (substring hex 2 3) (list "0" "1" "2" "3" "4" "5" "6" "7" "8" "9" "A" "B" "C" "D" "E" "F"))))
+        (not (not (member (substring hex 3 4) (list "0" "1" "2" "3" "4" "5" "6" "7" "8" "9" "A" "B" "C" "D" "E" "F"))))
+        (not (not (member (substring hex 4 5) (list "0" "1" "2" "3" "4" "5" "6" "7" "8" "9" "A" "B" "C" "D" "E" "F"))))
+        (not (not (member (substring hex 5 6) (list "0" "1" "2" "3" "4" "5" "6" "7" "8" "9" "A" "B" "C" "D" "E" "F"))))
+      )
+)
 
 ; Dom: image (image)
 ; Rec: #t o #f dependiendo si la imagen esta constituida de pixhex-d
