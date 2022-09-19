@@ -116,8 +116,8 @@
 ;Recursion: No se usa
 ;NOTA: No se puede usar el constructor (image) debido a que (recursion-fliph) retorna una lista, y si se usa el
 ;      constructor el resultado seria (width height ((pixmaps))), o sea, dos listas envuelven a pixmaps en vez de una 
-(define (flip90 img)
-  (list (getWidth img) (getHeight img) (recursion-flip90 (third img) (getWidth img)))
+(define (rotate90 img)
+  (list (getWidth img) (getHeight img) (recursion-rotate90 (third img) (getWidth img)))
 )
 ;+------------- OTRAS FUNCIONES ---------------+
 
@@ -211,9 +211,9 @@
 ;      y le aplica una traslacion (0, width) para que el punto inferior izquierdo sea (1,1) y no un negativo
 ;      se llama nuevamente para que vaya modificando los siguientes elementos y con la funcion append se agregan.
 ;Recursion: Natural
-(define (recursion-flip90 pixels width)
+(define (recursion-rotate90 pixels width)
   (if (not (null? (cdr pixels)))
-    (append (list (append (list (second (car pixels)) (+ (* (first (car pixels)) -1) width 1)) (cddar pixels))) (recursion-flip90 (cdr pixels) width))
+    (append (list (append (list (second (car pixels)) (+ (* (first (car pixels)) -1) width 1)) (cddar pixels))) (recursion-rotate90 (cdr pixels) width))
     (list (append (list (second (car pixels)) (+ (* (first (car pixels)) -1) width 1)) (cddar pixels)))
   )
 )
