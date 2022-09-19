@@ -107,6 +107,12 @@
   )
 )
 
+;Dom: img (image), x1 (number), x2 (number), y1 (number), y2 (number)
+;Rec: image (image)
+;Desc: Toma una imagen y le aplica llamados recursivos para revisar si esta dentro de las coordenadas indicadas en la funcion.
+;Recursion: No se usa
+;NOTA: No se puede usar el constructor (image) debido a que (recursion-flipv) retorna una lista, y si se usa el
+;      constructor el resultado seria (width height ((pixmaps))), o sea, dos listas envuelven a pixmaps en vez de una 
 (define (crop img x1 x2 y1 y2)
   (if (and (image? img) (number? x1) (number? x2) (number? y1) (number? y2))
     (list (getWidth img) (getHeight img) (recursion-crop (third img) x1 x2 y1 y2))
@@ -114,6 +120,12 @@
   )
 )
 
+;Dom: pixels (list), x1 (number), x2 (number), y1 (number), y2 (number)
+;Rec: pixels (list)
+;Desc: Recursivamente a traves de las funciones (<=) y (>=) revisa si el pixel se encuentra dentro del
+;      cuadrado formado por los puntos (x1, y1) (x2, y2), si ese es el caso los agrega a la lista de pixeles,
+;      y si no los salta y sigue recursivamente con el siguiente.
+;Recursion: Natural
 (define (recursion-crop pixels x1 x2 y1 y2)
   (if (not (null? (cdr pixels)))
     (if (and 
