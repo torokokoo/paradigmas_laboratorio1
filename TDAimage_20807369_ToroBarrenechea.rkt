@@ -62,7 +62,8 @@
   (caddr image)
 )
   
-;+------------- OTRAS FUNCIONES ---------------+
+;+------------- MODIFICADORES ---------------+
+
 ;Dom: image (image)
 ;Rec: image (image)
 ;Desc: Toma una imagen y le aplica llamados recursivos para modificar los valores del eje X e invertirlos
@@ -72,6 +73,44 @@
 (define (flipH img)
   (list (getWidth img) (getHeight img) (recursion-fliph (third img) (getWidth img)))
 )
+
+;Dom: image (image)
+;Rec: image (image)
+;Desc: Toma una imagen y le aplica llamados recursivos para modificar los valores del eje Y e invertirlos
+;Recursion: No se usa
+;NOTA: No se puede usar el constructor (image) debido a que (recursion-flipv) retorna una lista, y si se usa el
+;      constructor el resultado seria (width height ((pixmaps))), o sea, dos listas envuelven a pixmaps en vez de una 
+(define (flipV img)
+  (list (getWidth img) (getHeight img) (recursion-flipv (third img) (getHeight img)))
+)
+
+;Dom: img (image), x1 (number), x2 (number), y1 (number), y2 (number)
+;Rec: image (image)
+;Desc: Toma una imagen y le aplica llamados recursivos para revisar si esta dentro de las coordenadas indicadas en la funcion.
+;Recursion: No se usa
+;NOTA: No se puede usar el constructor (image) debido a que (recursion-flipv) retorna una lista, y si se usa el
+;      constructor el resultado seria (width height ((pixmaps))), o sea, dos listas envuelven a pixmaps en vez de una 
+(define (crop img x1 x2 y1 y2)
+  (if (and (image? img) (number? x1) (number? x2) (number? y1) (number? y2))
+    (list (getWidth img) (getHeight img) (recursion-crop (third img) x1 x2 y1 y2))
+    (error "Los valores ingresados no son del tipo correcto")
+  )
+)
+
+;Dom: img (image)
+;Rec: image (image)
+;Desc: Toma una imagen y le aplica llamados recursivos para cambiar los pixrgb-d por pixhex-d
+;Recursion: No se usa
+;NOTA: No se puede usar el constructor (image) debido a que (recursion-flipv) retorna una lista, y si se usa el
+;      constructor el resultado seria (width height ((pixmaps))), o sea, dos listas envuelven a pixmaps en vez de una 
+(define (imgRGB->imgHex img)
+  (if (and (image? img) (pixmap? img))
+    (list (getWidth img) (getHeight img) (recursion-rgb->hex (third img)))
+    (error "La imagen ingresada no es del tipo correcto")
+  )
+)
+
+;+------------- OTRAS FUNCIONES ---------------+
 
 ;Dom: pixels (list), width (number)
 ;Rec: pixels (list)
@@ -85,16 +124,6 @@
   )
 )
 
-;Dom: image (image)
-;Rec: image (image)
-;Desc: Toma una imagen y le aplica llamados recursivos para modificar los valores del eje Y e invertirlos
-;Recursion: No se usa
-;NOTA: No se puede usar el constructor (image) debido a que (recursion-flipv) retorna una lista, y si se usa el
-;      constructor el resultado seria (width height ((pixmaps))), o sea, dos listas envuelven a pixmaps en vez de una 
-(define (flipV img)
-  (list (getWidth img) (getHeight img) (recursion-flipv (third img) (getHeight img)))
-)
-
 ;Dom: pixels (list), height (number)
 ;Rec: pixels (list)
 ;Desc: Usando la funcion list-set invierte el valor de la ubicacion del eje Y, para que se cree el efecto espejo verticalmente
@@ -104,19 +133,6 @@
   (if (not (null? (cdr pixels)))
     (append (list (list-set (car pixels) 1 (+ (- height (cadar pixels)) 1))) (recursion-flipv (cdr pixels) height))
     (list (list-set (car pixels) 1 (+ (- height (cadar pixels)) 1)))
-  )
-)
-
-;Dom: img (image), x1 (number), x2 (number), y1 (number), y2 (number)
-;Rec: image (image)
-;Desc: Toma una imagen y le aplica llamados recursivos para revisar si esta dentro de las coordenadas indicadas en la funcion.
-;Recursion: No se usa
-;NOTA: No se puede usar el constructor (image) debido a que (recursion-flipv) retorna una lista, y si se usa el
-;      constructor el resultado seria (width height ((pixmaps))), o sea, dos listas envuelven a pixmaps en vez de una 
-(define (crop img x1 x2 y1 y2)
-  (if (and (image? img) (number? x1) (number? x2) (number? y1) (number? y2))
-    (list (getWidth img) (getHeight img) (recursion-crop (third img) x1 x2 y1 y2))
-    (error "Los valores ingresados no son del tipo correcto")
   )
 )
 
@@ -146,6 +162,37 @@
         (list (car pixels))
         (list)
     )
+  )
+)
+
+;Dom: r (number), g (number), b (number)
+;Rec: hex (string)
+;Desc: Pasa a traves de todos los elementos RGB y le calcula el cuociente y resto al dividirlo por 16, para asi asignarle
+;      un valor exadecimal ingresando a ese indice en la lista (que se encuentra ordenada)
+;Recursion: No usa
+(define (RGB->hex r g b)
+  (string-join 
+    (list
+      (list-ref (list "0" "1" "2" "3" "4" "5" "6" "7" "8" "9" "A" "B" "C" "D" "E" "F") (quotient r 16))
+      (list-ref (list "0" "1" "2" "3" "4" "5" "6" "7" "8" "9" "A" "B" "C" "D" "E" "F") (remainder r 16))
+      (list-ref (list "0" "1" "2" "3" "4" "5" "6" "7" "8" "9" "A" "B" "C" "D" "E" "F") (quotient g 16))
+      (list-ref (list "0" "1" "2" "3" "4" "5" "6" "7" "8" "9" "A" "B" "C" "D" "E" "F") (remainder g 16))
+      (list-ref (list "0" "1" "2" "3" "4" "5" "6" "7" "8" "9" "A" "B" "C" "D" "E" "F") (quotient b 16))
+      (list-ref (list "0" "1" "2" "3" "4" "5" "6" "7" "8" "9" "A" "B" "C" "D" "E" "F") (remainder b 16))
+    )
+  ""
+  )
+)
+
+;Dom: pixels (list)
+;Rec: pixels (list)
+;Desc: Usando la funcion RGB->hex convierte los valores RGB en Hexadecimales y construye un TDA pixhex-d
+;      se llama nuevamente para que vaya modificando los siguientes elementos y con la funcion append se agregan.
+;Recursion: Natural
+(define (recursion-rgb->hex pixels)
+  (if (not (null? (cdr pixels)))
+    (append (list (pixhex-d (first (car pixels)) (second (car pixels)) (RGB->hex (third (car pixels)) (fourth (car pixels)) (fifth (car pixels))) (sixth (car pixels)))) (recursion-rgb->hex (cdr pixels)))
+    (list (pixhex-d (first (car pixels)) (second (car pixels)) (RGB->hex (third (car pixels)) (fourth (car pixels)) (fifth (car pixels))) (sixth (car pixels))))
   )
 )
 
