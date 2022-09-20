@@ -119,6 +119,61 @@
 (define (rotate90 img)
   (list (getWidth img) (getHeight img) (recursion-rotate90 (third img) (getWidth img)))
 )
+
+; Funcion para externalizar el sort, la dejo como recordatorio en caso de utilizarla
+;(define (sort-histogram h)
+;  (sort h #:key cadr >)
+;)
+
+;Dom: img (image)
+;Rec: image
+;Desc: Hace el primer llamado recursivo para eliminar los elementos que tengan el color que mas se repite basado en el histograma
+;Recursion: No se usa
+(define (compress img)
+  (if (pixmap? img)
+    (list (getWidth img) (getHeight img) (recursion-compress-rgb (getPixels img) (caar (histogram img))))
+    (list (getWidth img) (getHeight img) (recursion-compress (getPixels img) (caar (histogram img))))
+  )
+)
+
+;Dom: pixels (list), color (bit? | hex?)
+;Rec: pixels (list)
+;Desc: Recursivamente a traves de las funcion eq? revisa si el pixel es del mismo color que el indicado por el histograma
+;      si ese es el caso lo omite de la lista de pixeles,
+;      y si no los salta (o sea que se mantiene agregado) y sigue recursivamente con el siguiente.
+;Recursion: Natural
+(define (recursion-compress pixels color)
+  (if (not (null? (cdr pixels)))
+    (if (not (eq? (third (car pixels)) color))
+        (append (list (car pixels)) (recursion-compress (cdr pixels) color))
+        (append (list) (recursion-compress (cdr pixels) color))
+    )
+    (if (not (eq? (third (car pixels)) color))
+        (list (car pixels))
+        (list)
+    )
+  )
+)
+
+;Dom: pixels (list), color (rgb?)
+;Rec: pixels (list)
+;Desc: Recursivamente a traves de las funcion eq-rgb? revisa si el pixel es del mismo color que el indicado por el histograma
+;      si ese es el caso lo omite de la lista de pixeles,
+;      y si no los salta (o sea que se mantiene agregado) y sigue recursivamente con el siguiente.
+;Recursion: Natural
+;NOTA: Es el mismo algoritmo de arriba, solamente que este funciona para pixmaps (ya que la comparacion de rgb? se trata de distinta forma)
+(define (recursion-compress-rgb pixels color)
+  (if (not (null? (cdr pixels)))
+    (if (not (eq-rgb? (list (third (car pixels)) (fourth (car pixels)) (fifth (car pixels))) color))
+        (append (list (car pixels)) (recursion-compress-rgb (cdr pixels) color))
+        (append (list) (recursion-compress-rgb (cdr pixels) color))
+    )
+    (if (not (eq-rgb? (list (third (car pixels)) (fourth (car pixels)) (fifth (car pixels))) color))
+        (list (car pixels))
+        (list)
+    )
+  )
+)
 ;+------------- OTRAS FUNCIONES ---------------+
 
 ;Dom: pixels (list), width (number)
@@ -217,5 +272,48 @@
     (list (append (list (second (car pixels)) (+ (* (first (car pixels)) -1) width 1)) (cddar pixels)))
   )
 )
+
+;+--------------------------------------------+            
+;|               TDA HISTOGRAM                |            
+;+--------------------------------------------+
+
+;+------------- REPRESENTACION---------------+
+; Este TDA corresponde a un histograma, donde se guarda la cantidad de repeteciones de los colores en la imagen,
+; a partir del ingreso de un TDA image
+; (image)
+
+;+------------- CONSTRUCTORES ---------------+
+
+; Dom: img (image)
+; Rec: histogram (list)
+; Descripcion: Retorna una lista con la cantidad de veces que se repiten los colores de la forma '((color . veces))
+; Recursion: No se usa
+(define (histogram img)
+  (sort
+    (if (or (bitmap? img) (hexmap? img))
+      (remove-duplicates 
+        (map (lambda (i) 
+          (list i (count (lambda (j) (eq? i j)) (map (lambda (e) (list-ref e 2)) (third img)
+        )))) (map (lambda (e) (list-ref e 2)) (third img)))
+      )
+      (remove-duplicates 
+        (map (lambda (i) 
+          (list i (count (lambda (j) (eq-rgb? i j)) (map (lambda (e) (list (getR e) (getG e) (getB e))) (third img)
+        )))) (map (lambda (e) (list (getR e) (getG e) (getB e))) (third img)))
+      )
+    )
+    #:key cadr >
+  )
+)
+
+;+------------- OTRAS FUNCIONES ---------------+
+; Dom: lst1 (list), lst2 (list)
+; Rec: #t o #f (?boolean)
+; Desc: Compara dos listas que contienen valores RGB (r (rgb?), g (rgb?), b (rgb?)) y revisa que sean iguales
+; Recursion: No se usa
+(define (eq-rgb? lst1 lst2)
+  (and (= (first lst1) (first lst2)) (= (second lst1) (second lst2)) (= (third lst1) (third lst2)))
+)
+
 ; Exportar las funciones del TDA
 (provide (all-defined-out))
