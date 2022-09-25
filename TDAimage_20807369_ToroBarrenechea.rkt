@@ -136,45 +136,59 @@
   )
 )
 
-;Dom: pixels (list), color (bit? | hex?)
-;Rec: pixels (list)
-;Desc: Recursivamente a traves de las funcion eq? revisa si el pixel es del mismo color que el indicado por el histograma
-;      si ese es el caso lo omite de la lista de pixeles,
-;      y si no los salta (o sea que se mantiene agregado) y sigue recursivamente con el siguiente.
-;Recursion: Natural
-(define (recursion-compress pixels color)
-  (if (not (null? (cdr pixels)))
-    (if (not (eq? (third (car pixels)) color))
-        (append (list (car pixels)) (recursion-compress (cdr pixels) color))
-        (append (list) (recursion-compress (cdr pixels) color))
-    )
-    (if (not (eq? (third (car pixels)) color))
-        (list (car pixels))
-        (list)
-    )
+;Dom: img (image)
+;Rec: image
+;Desc: Hace el llamado para aplicar fn sobre los pixeles de la imagen
+;Recursion: No se usa
+(define (edit fn img)
+  (if (image? img)
+    (list (getWidth img) (getHeight img) (fn (getWidth img) (getHeight img) (getPixels img)))
+    (error "La imagen ingresada no es del tipo correcto")
   )
 )
 
-;Dom: pixels (list), color (rgb?)
-;Rec: pixels (list)
-;Desc: Recursivamente a traves de las funcion eq-rgb? revisa si el pixel es del mismo color que el indicado por el histograma
-;      si ese es el caso lo omite de la lista de pixeles,
-;      y si no los salta (o sea que se mantiene agregado) y sigue recursivamente con el siguiente.
-;Recursion: Natural
-;NOTA: Es el mismo algoritmo de arriba, solamente que este funciona para pixmaps (ya que la comparacion de rgb? se trata de distinta forma)
-(define (recursion-compress-rgb pixels color)
-  (if (not (null? (cdr pixels)))
-    (if (not (eq-rgb? (list (third (car pixels)) (fourth (car pixels)) (fifth (car pixels))) color))
-        (append (list (car pixels)) (recursion-compress-rgb (cdr pixels) color))
-        (append (list) (recursion-compress-rgb (cdr pixels) color))
-    )
-    (if (not (eq-rgb? (list (third (car pixels)) (fourth (car pixels)) (fifth (car pixels))) color))
-        (list (car pixels))
-        (list)
-    )
+;+------------- OTRAS FUNCIONES ---------------+
+
+
+;Dom: w (number?) h (number?) p [pixbit-d]
+;Rec: image
+;Desc: Invierte los valores de los bits de los pixeles (1->0 y 0->1)
+;Recursion: No se usa
+(define (invertColorBit w h p)
+  (if (bitmap? (list w h p))
+    (map (lambda (x) (list (first x) (second x) (abs (- (third x) 1)) (fourth x))) p)
+    (error "La imagen ingresada no es del tipo bitmap?")
   )
 )
-;+------------- OTRAS FUNCIONES ---------------+
+
+;Dom: w (number?) h (number?) p [pixrgb-d]
+;Rec: image
+;Desc: Invierte los valores de los rgb de los pixeles (255->0 y 100->155, 0->255)
+;Recursion: No se usa
+(define (invertColorRGB w h p)
+  (if (pixmap? (list w h p))
+    (map (lambda (x) (list (first x) (second x) (abs (- (third x) 255)) (abs (- (fourth x) 255)) (abs (- (fifth x) 255)) (sixth x))) p)
+    (error "La imagen ingresada no es del tipo pixmap?")
+  )
+)
+
+;Dom: get (procedure) set (procedure) fn (procedure) img (pixmap?)
+;Rec: list (lista de pixeles)
+;Desc: Ajusta el canal especificado en set (setR, setG, setB) segun los valores entregados por get (getR, getG, getB) aplicados sobre
+;      la funcion (fn).
+;Recursion: No se usa
+(define (adjustChannel get set fn img)
+  (if (pixmap? img)
+    (map (lambda (x) (set x (fn (get x)))) (getPixels img))
+    (error "La imagen ingresada no es del tipo pixmap?")
+  )
+)
+
+;Dom: x (rgb?)
+;Rec: number (rgb?)
+;Desc: Aumenta en 1 el valor de ese canal.
+;Recursion: No se usa
+(define (incCh x) (+ x 1))
 
 ;Dom: pixels (list), width (number)
 ;Rec: pixels (list)
@@ -270,6 +284,45 @@
   (if (not (null? (cdr pixels)))
     (append (list (append (list (second (car pixels)) (+ (* (first (car pixels)) -1) width 1)) (cddar pixels))) (recursion-rotate90 (cdr pixels) width))
     (list (append (list (second (car pixels)) (+ (* (first (car pixels)) -1) width 1)) (cddar pixels)))
+  )
+)
+
+;Dom: pixels (list), color (bit? | hex?)
+;Rec: pixels (list)
+;Desc: Recursivamente a traves de las funcion eq? revisa si el pixel es del mismo color que el indicado por el histograma
+;      si ese es el caso lo omite de la lista de pixeles,
+;      y si no los salta (o sea que se mantiene agregado) y sigue recursivamente con el siguiente.
+;Recursion: Natural
+(define (recursion-compress pixels color)
+  (if (not (null? (cdr pixels)))
+    (if (not (eq? (third (car pixels)) color))
+        (append (list (car pixels)) (recursion-compress (cdr pixels) color))
+        (append (list) (recursion-compress (cdr pixels) color))
+    )
+    (if (not (eq? (third (car pixels)) color))
+        (list (car pixels))
+        (list)
+    )
+  )
+)
+
+;Dom: pixels (list), color (rgb?)
+;Rec: pixels (list)
+;Desc: Recursivamente a traves de las funcion eq-rgb? revisa si el pixel es del mismo color que el indicado por el histograma
+;      si ese es el caso lo omite de la lista de pixeles,
+;      y si no los salta (o sea que se mantiene agregado) y sigue recursivamente con el siguiente.
+;Recursion: Natural
+;NOTA: Es el mismo algoritmo de arriba, solamente que este funciona para pixmaps (ya que la comparacion de rgb? se trata de distinta forma)
+(define (recursion-compress-rgb pixels color)
+  (if (not (null? (cdr pixels)))
+    (if (not (eq-rgb? (list (third (car pixels)) (fourth (car pixels)) (fifth (car pixels))) color))
+        (append (list (car pixels)) (recursion-compress-rgb (cdr pixels) color))
+        (append (list) (recursion-compress-rgb (cdr pixels) color))
+    )
+    (if (not (eq-rgb? (list (third (car pixels)) (fourth (car pixels)) (fifth (car pixels))) color))
+        (list (car pixels))
+        (list)
+    )
   )
 )
 

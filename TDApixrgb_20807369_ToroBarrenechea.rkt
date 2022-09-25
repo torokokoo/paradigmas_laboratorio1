@@ -40,6 +40,30 @@
 ; Desc: Extrae el valor azul de un pixrgb-d
 ; Recursion: No se usa
 (define (getB pixrgb) (fifth pixrgb))
+
+;+------------- MODIFICADORES ---------------+
+
+; Dom: pix (pixrgb-d)
+; Rec: pixrgb-d
+; Desc: Modifica el valor red de un pixrgb
+; Recursion: No se usa
+(define (setR pix r)
+  (pixrgb-d (first pix) (second pix) r (getG pix) (getB pix) (sixth pix))
+)
+
+; Dom: pix (pixrgb-d)
+; Rec: pixrgb-d
+; Desc: Modifica el valor green de un pixrgb
+(define (setG pix g)
+  (pixrgb-d (first pix) (second pix) (getR pix) g (getB pix) (sixth pix))
+)
+
+; Dom: pix (pixrgb-d)
+; Rec: pixrgb-d
+; Desc: Modifica el valor blue de un pixrgb
+(define (setB pix b)
+  (pixrgb-d (first pix) (second pix) (getR pix) (getG pix) b (sixth pix))
+)
 ;+------------- PERTENENCIA ---------------+
 
 ; Dom: b (int)
