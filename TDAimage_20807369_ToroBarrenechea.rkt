@@ -3,6 +3,7 @@
 (require "TDApixbit_20807369_ToroBarrenechea.rkt")
 (require "TDApixrgb_20807369_ToroBarrenechea.rkt")
 (require "TDApixhex_20807369_ToroBarrenechea.rkt")
+(require "TDAhistogram_20807369_ToroBarrenechea.rkt")
 
 ;+--------------------------------------------+            
 ;|                 TDA IMAGE                  |            
@@ -63,124 +64,11 @@
 )
   
 ;+------------- MODIFICADORES ---------------+
+; SE ENCUENTRAN EN MAIN PARA QUE SEA MAS FACIL LA REVISION DE LAS FUNCIONES REQUERIDAS.
 
-;Dom: image (image)
-;Rec: image (image)
-;Desc: Toma una imagen y le aplica llamados recursivos para modificar los valores del eje X e invertirlos
-;Recursion: No se usa
-;NOTA: No se puede usar el constructor (image) debido a que (recursion-fliph) retorna una lista, y si se usa el
-;      constructor el resultado seria (width height ((pixmaps))), o sea, dos listas envuelven a pixmaps en vez de una 
-(define (flipH img)
-  (list (getWidth img) (getHeight img) (recursion-fliph (third img) (getWidth img)))
-)
-
-;Dom: image (image)
-;Rec: image (image)
-;Desc: Toma una imagen y le aplica llamados recursivos para modificar los valores del eje Y e invertirlos
-;Recursion: No se usa
-;NOTA: No se puede usar el constructor (image) debido a que (recursion-flipv) retorna una lista, y si se usa el
-;      constructor el resultado seria (width height ((pixmaps))), o sea, dos listas envuelven a pixmaps en vez de una 
-(define (flipV img)
-  (list (getWidth img) (getHeight img) (recursion-flipv (third img) (getHeight img)))
-)
-
-;Dom: img (image), x1 (number), x2 (number), y1 (number), y2 (number)
-;Rec: image (image)
-;Desc: Toma una imagen y le aplica llamados recursivos para revisar si esta dentro de las coordenadas indicadas en la funcion.
-;Recursion: No se usa
-;NOTA: No se puede usar el constructor (image) debido a que (recursion-flipv) retorna una lista, y si se usa el
-;      constructor el resultado seria (width height ((pixmaps))), o sea, dos listas envuelven a pixmaps en vez de una 
-(define (crop img x1 x2 y1 y2)
-  (if (and (image? img) (number? x1) (number? x2) (number? y1) (number? y2))
-    (list (getWidth img) (getHeight img) (recursion-crop (third img) x1 x2 y1 y2))
-    (error "Los valores ingresados no son del tipo correcto")
-  )
-)
-
-;Dom: img (image)
-;Rec: image (image)
-;Desc: Toma una imagen y le aplica llamados recursivos para cambiar los pixrgb-d por pixhex-d
-;Recursion: No se usa
-;NOTA: No se puede usar el constructor (image) debido a que (recursion-flipv) retorna una lista, y si se usa el
-;      constructor el resultado seria (width height ((pixmaps))), o sea, dos listas envuelven a pixmaps en vez de una 
-(define (imgRGB->imgHex img)
-  (if (and (image? img) (pixmap? img))
-    (list (getWidth img) (getHeight img) (recursion-rgb->hex (third img)))
-    (error "La imagen ingresada no es del tipo correcto")
-  )
-)
-
-;Dom: image (image)
-;Rec: image (image)
-;Desc: Toma una imagen y le aplica llamados recursivos para modificar los valores del eje X e Y realizando una rotacion en 90 grados.
-;Recursion: No se usa
-;NOTA: No se puede usar el constructor (image) debido a que (recursion-fliph) retorna una lista, y si se usa el
-;      constructor el resultado seria (width height ((pixmaps))), o sea, dos listas envuelven a pixmaps en vez de una 
-(define (rotate90 img)
-  (list (getWidth img) (getHeight img) (recursion-rotate90 (third img) (getWidth img)))
-)
-
-; Funcion para externalizar el sort, la dejo como recordatorio en caso de utilizarla
-;(define (sort-histogram h)
-;  (sort h #:key cadr >)
-;)
-
-;Dom: img (image)
-;Rec: image
-;Desc: Hace el primer llamado recursivo para eliminar los elementos que tengan el color que mas se repite basado en el histograma
-;Recursion: No se usa
-(define (compress img)
-  (if (pixmap? img)
-    (list (getWidth img) (getHeight img) (recursion-compress-rgb (getPixels img) (caar (histogram img))))
-    (list (getWidth img) (getHeight img) (recursion-compress (getPixels img) (caar (histogram img))))
-  )
-)
-
-;Dom: img (image)
-;Rec: image
-;Desc: Hace el llamado para aplicar fn sobre los pixeles de la imagen
-;Recursion: No se usa
-(define (edit fn img)
-  (if (image? img)
-    (list (getWidth img) (getHeight img) (fn (getWidth img) (getHeight img) (getPixels img)))
-    (error "La imagen ingresada no es del tipo correcto")
-  )
-)
-
-;Dom: img (image), fn (pixbit->string, pixhex->string, pixrgb->string)
-;Rec: string
-;Desc: Aplica la funcion fn sobre la imagen. La funcion fn devuelve un string 
-;Recursion: No se usa
-(define (image->string img fn)
-  (fn (getWidth img) (getHeight img) (getPixels img))
-)
-
-;Dom: w|width (number?), h|height (number?), p|pixels (list de [pixbit-d])
-;Rec: string
-;Desc: Devuelve un string que representa a la imagen usando saltos de linea para las diferentes filas y tab para las diferentes columnas
-;Recursion: De cola
-(define (pixbit->string w h p)
-  (string-append (string-join (map (lambda (e) (number->string (getBit e))) (car (sort-pixels w h p))) "\t") "\n" (recursion-bit->str (cdr (sort-pixels w h p))))
-)
-
-;Dom: w|width (number?), h|height (number?), p|pixels (list de [pixhex-d])
-;Rec: string
-;Desc: Devuelve un string que representa a la imagen usando saltos de linea para las diferentes filas y tab para las diferentes columnas
-;Recursion: De cola
-(define (pixhex->string w h p)
-  (string-append (string-join (map (lambda (e) (getHex e)) (car (sort-pixels w h p))) "\t") "\n" (recursion-hex->str (cdr (sort-pixels w h p))))
-)
-
-;Dom: w|width (number?), h|height (number?), p|pixels (list de [pixrgb-d])
-;Rec: string
-;Desc: Devuelve un string que representa a la imagen usando saltos de linea para las diferentes filas y tab para las diferentes columnas
-;      Para esto se convirtio la imagen pixmap? en hexmap? usando imgRGB->imgHex, asi se puede reutilizar el codigo de pixhex->string
-;Recursion: De cola
-(define (pixrgb->string w h p)
-  (string-append (string-join (map (lambda (e) (getHex e)) (car (sort-pixels w h (getPixels (imgRGB->imgHex (list w h p)))))) "\t") "\n" (recursion-hex->str (cdr (sort-pixels w h (getPixels (imgRGB->imgHex (list w h p)))))))
-)
 
 ;+------------- OTRAS FUNCIONES ---------------+
+; Funciones de apoyo a las funciones requeridas.
 
 ;Dom: w|width (number?), h|height (number?), p|pixels (list)
 ;Rec: list, lista de listas, cada lista interior representa un valor en el eje Y.
@@ -227,45 +115,6 @@
   )
 )
 
-;Dom: w (number?) h (number?) p [pixbit-d]
-;Rec: image
-;Desc: Invierte los valores de los bits de los pixeles (1->0 y 0->1)
-;Recursion: No se usa
-(define (invertColorBit w h p)
-  (if (bitmap? (list w h p))
-    (map (lambda (x) (list (first x) (second x) (abs (- (third x) 1)) (fourth x))) p)
-    (error "La imagen ingresada no es del tipo bitmap?")
-  )
-)
-
-;Dom: w (number?) h (number?) p [pixrgb-d]
-;Rec: image
-;Desc: Invierte los valores de los rgb de los pixeles (255->0 y 100->155, 0->255)
-;Recursion: No se usa
-(define (invertColorRGB w h p)
-  (if (pixmap? (list w h p))
-    (map (lambda (x) (list (first x) (second x) (abs (- (third x) 255)) (abs (- (fourth x) 255)) (abs (- (fifth x) 255)) (sixth x))) p)
-    (error "La imagen ingresada no es del tipo pixmap?")
-  )
-)
-
-;Dom: get (procedure) set (procedure) fn (procedure) img (pixmap?)
-;Rec: list (lista de pixeles)
-;Desc: Ajusta el canal especificado en set (setR, setG, setB) segun los valores entregados por get (getR, getG, getB) aplicados sobre
-;      la funcion (fn).
-;Recursion: No se usa
-(define (adjustChannel get set fn img)
-  (if (pixmap? img)
-    (map (lambda (x) (set x (fn (get x)))) (getPixels img))
-    (error "La imagen ingresada no es del tipo pixmap?")
-  )
-)
-
-;Dom: x (rgb?)
-;Rec: number (rgb?)
-;Desc: Aumenta en 1 el valor de ese canal.
-;Recursion: No se usa
-(define (incCh x) (+ x 1))
 
 ;Dom: pixels (list), width (number)
 ;Rec: pixels (list)
@@ -403,47 +252,6 @@
   )
 )
 
-;+--------------------------------------------+            
-;|               TDA HISTOGRAM                |            
-;+--------------------------------------------+
-
-;+------------- REPRESENTACION---------------+
-; Este TDA corresponde a un histograma, donde se guarda la cantidad de repeteciones de los colores en la imagen,
-; a partir del ingreso de un TDA image
-; (image)
-
-;+------------- CONSTRUCTORES ---------------+
-
-; Dom: img (image)
-; Rec: histogram (list)
-; Descripcion: Retorna una lista con la cantidad de veces que se repiten los colores de la forma '((color . veces))
-; Recursion: No se usa
-(define (histogram img)
-  (sort
-    (if (or (bitmap? img) (hexmap? img))
-      (remove-duplicates 
-        (map (lambda (i) 
-          (list i (count (lambda (j) (eq? i j)) (map (lambda (e) (list-ref e 2)) (third img)
-        )))) (map (lambda (e) (list-ref e 2)) (third img)))
-      )
-      (remove-duplicates 
-        (map (lambda (i) 
-          (list i (count (lambda (j) (eq-rgb? i j)) (map (lambda (e) (list (getR e) (getG e) (getB e))) (third img)
-        )))) (map (lambda (e) (list (getR e) (getG e) (getB e))) (third img)))
-      )
-    )
-    #:key cadr >
-  )
-)
-
-;+------------- OTRAS FUNCIONES ---------------+
-; Dom: lst1 (list), lst2 (list)
-; Rec: #t o #f (?boolean)
-; Desc: Compara dos listas que contienen valores RGB (r (rgb?), g (rgb?), b (rgb?)) y revisa que sean iguales
-; Recursion: No se usa
-(define (eq-rgb? lst1 lst2)
-  (and (= (first lst1) (first lst2)) (= (second lst1) (second lst2)) (= (third lst1) (third lst2)))
-)
 
 ; Exportar las funciones del TDA
 (provide (all-defined-out))
