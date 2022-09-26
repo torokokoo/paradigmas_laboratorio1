@@ -51,6 +51,13 @@
       )
   )
 
+;+------------- SELECTORES ---------------+
+;Dom: pixbit-d
+;Rec: number (bit?)
+;Desc: Extrae el bit del pixel entregado.
+;Recursion: No se usa
+(define (getBit pixbit) (third pixbit))
+
 ;+------------- OTRAS FUNCIONES ---------------+
 ;Dom: list (list), status (boolean)
 ;Rec: #t o #f dependiendo si cumple las condiciones indicadas

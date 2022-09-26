@@ -147,8 +147,85 @@
   )
 )
 
+;Dom: img (image), fn (pixbit->string, pixhex->string, pixrgb->string)
+;Rec: string
+;Desc: Aplica la funcion fn sobre la imagen. La funcion fn devuelve un string 
+;Recursion: No se usa
+(define (image->string img fn)
+  (fn (getWidth img) (getHeight img) (getPixels img))
+)
+
+;Dom: w|width (number?), h|height (number?), p|pixels (list de [pixbit-d])
+;Rec: string
+;Desc: Devuelve un string que representa a la imagen usando saltos de linea para las diferentes filas y tab para las diferentes columnas
+;Recursion: De cola
+(define (pixbit->string w h p)
+  (string-append (string-join (map (lambda (e) (number->string (getBit e))) (car (sort-pixels w h p))) "\t") "\n" (recursion-bit->str (cdr (sort-pixels w h p))))
+)
+
+;Dom: w|width (number?), h|height (number?), p|pixels (list de [pixhex-d])
+;Rec: string
+;Desc: Devuelve un string que representa a la imagen usando saltos de linea para las diferentes filas y tab para las diferentes columnas
+;Recursion: De cola
+(define (pixhex->string w h p)
+  (string-append (string-join (map (lambda (e) (getHex e)) (car (sort-pixels w h p))) "\t") "\n" (recursion-hex->str (cdr (sort-pixels w h p))))
+)
+
+;Dom: w|width (number?), h|height (number?), p|pixels (list de [pixrgb-d])
+;Rec: string
+;Desc: Devuelve un string que representa a la imagen usando saltos de linea para las diferentes filas y tab para las diferentes columnas
+;      Para esto se convirtio la imagen pixmap? en hexmap? usando imgRGB->imgHex, asi se puede reutilizar el codigo de pixhex->string
+;Recursion: De cola
+(define (pixrgb->string w h p)
+  (string-append (string-join (map (lambda (e) (getHex e)) (car (sort-pixels w h (getPixels (imgRGB->imgHex (list w h p)))))) "\t") "\n" (recursion-hex->str (cdr (sort-pixels w h (getPixels (imgRGB->imgHex (list w h p)))))))
+)
+
 ;+------------- OTRAS FUNCIONES ---------------+
 
+;Dom: w|width (number?), h|height (number?), p|pixels (list)
+;Rec: list, lista de listas, cada lista interior representa un valor en el eje Y.
+;Desc: A traves de la funcion sort, se ordenan respecto al eje Y, se separan en listas por cada valor del eje Y y luego se ordenan por el eje X.
+;Recursion: De cola
+(define (sort-pixels width height pixels)
+  (map (lambda (lp) (sort lp #:key car <))
+    (append (list (list-tail (sort pixels #:key cadr <) (- (length pixels) width))) (recursion-sort-pixels (list-tail (sort pixels #:key cadr >) width) width))
+  )
+)
+
+;Dom: p|pixels (list), w|width (number?)
+;Rec: list, lista de listas, cada lista interior representa un valor en el eje Y.
+;Desc: A traves de la funcion sort, se ordenan respecto al eje Y, se separan en listas por cada valor del eje Y y luego se ordenan por el eje X.
+;Recursion: De cola
+(define (recursion-sort-pixels pixels width)
+  (if (< (length pixels) width)
+    (append (list (list-tail (sort pixels #:key cadr <) (- (length pixels) width))) (recursion-sort-pixels (list-tail (sort pixels #:key cadr >) width) width))
+    (list (list-tail (sort pixels #:key cadr <) (- (length pixels) width)))
+  )
+)
+
+;Dom: p|pixels (list de [pixbit-d])
+;Rec: string
+;Desc: Llamado recursivo para extraer los bits a traves de map y convertirlos a string, cada llamada representa una fila por ende se agrega \n
+;      antes de llamar nuevamente a la funcion
+;Recursion: de cola 
+(define (recursion-bit->str p)
+  (if (not (null? (cdr p)))
+    (string-append (string-join (map (lambda (e) (number->string (getBit e))) (car p)) "\t") "\n" (recursion-bit->str (cdr p)))
+    (string-append (string-join (map (lambda (e) (number->string (getBit e))) (car p)) "\t") "\n")
+  )
+)
+
+;Dom: p|pixels (list de [pixhex-d])
+;Rec: string
+;Desc: Llamado recursivo para extraer los valores hexadecimales a traves de map y convertirlos a string, cada llamada representa 
+;      una fila por ende se agrega \n antes de llamar nuevamente a la funcion
+;Recursion: de cola 
+(define (recursion-hex->str p)
+  (if (not (null? (cdr p)))
+    (string-append (string-join (map (lambda (e) (getHex e)) (car p)) "\t") "\n" (recursion-hex->str (cdr p)))
+    (string-append (string-join (map (lambda (e) (getHex e)) (car p)) "\t") "\n")
+  )
+)
 
 ;Dom: w (number?) h (number?) p [pixbit-d]
 ;Rec: image

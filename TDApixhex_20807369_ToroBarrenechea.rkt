@@ -58,6 +58,13 @@
       )
   )
 
+;+------------- SELECTORES ---------------+
+;Dom: pixhex-d
+;Rec: string (hex?)
+;Desc: Extrae el bit del pixel entregado.
+;Recursion: No se usa
+(define (getHex pixhex) (third pixhex))
+
 ;+------------- OTRAS FUNCIONES ---------------+
 ;Dom: list (list), status (boolean)
 ;Rec: #t o #f dependiendo si cumple las condiciones indicadas
