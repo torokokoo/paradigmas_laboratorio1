@@ -7,6 +7,11 @@
 (require "TDAhistogram_20807369_ToroBarrenechea.rkt")
 
 
+; >-------------------------- FUNCION pixmap? bitmap? hexmap? --------------------------<
+; Se encuentran en sus TDAs respectivos, debido a que por un tema de importacion se imposibilita
+; tenerlos en este archivo main ya que se romperian otras funciones propias del TDA image.
+
+
 ; >-------------------------- FUNCION flipH --------------------------<
 ;Dom: image (image)
 ;Rec: image (image)
