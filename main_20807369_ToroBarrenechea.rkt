@@ -12,6 +12,15 @@
 ; tenerlos en este archivo main ya que se romperian otras funciones propias del TDA image.
 
 
+; >-------------------------- FUNCION compressed? --------------------------<
+;Dom: image (image)
+;Rec: #t o #f (boolean)
+;Desc: Revisa si una imagen esta comprimida comparando la cantidad de pixeles
+;Recursion: No se usa
+
+(define (compressed? img)
+  (not (= (* (getWidth img) (getHeight img)) (length (getPixels img))))
+)
 ; >-------------------------- FUNCION flipH --------------------------<
 ;Dom: image (image)
 ;Rec: image (image)
