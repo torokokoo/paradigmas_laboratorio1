@@ -25,10 +25,28 @@
     (pixbit-d 3 1 1 0)
     (pixbit-d 3 2 0 0)
     (pixbit-d 3 3 1 0)
-    (pixbit-d 3 4 0 0)
+    (pixbit-d 3 4 1 0)
     (pixbit-d 4 1 1 0)
     (pixbit-d 4 2 0 0)
     (pixbit-d 4 3 1 0)
-    (pixbit-d 4 4 0 0)
+    (pixbit-d 4 4 1 0)
   )
 )
+
+(flipH bit-image)
+(flipV rgb-image)
+(compressed? (compress hex-image)) ;#t
+(compressed? bit-image-xl) ;#f
+(histogram bit-image) ;(2 pixeles de color 0 y 2 pixeles de color 1)
+(histogram bit-image-xl) ;(10 pixeles de color 1 y 6 pixeles de color 2)
+(histogram hex-image) ;1 de cada uno
+(display (image->string bit-image-xl pixbit->string))
+;output
+;0 0 1 1
+;1 1 1 1
+
+(crop bit-image-xl 2 4 0 2) ;6 pixeles
+(imgRGB->imgHex rgb-image)
+(rotate90 (imgRGB->imgHex rgb-image))
+(edit invertColorBit bit-image)
+(edit invertColorRGB rgb-image)
