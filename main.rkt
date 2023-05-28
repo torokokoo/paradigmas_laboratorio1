@@ -1,10 +1,10 @@
 #lang racket
 
-(require "TDApixbit_20807369_ToroBarrenechea.rkt")
-(require "TDApixrgb_20807369_ToroBarrenechea.rkt")
-(require "TDApixhex_20807369_ToroBarrenechea.rkt")
-(require "TDAimage_20807369_ToroBarrenechea.rkt")
-(require "TDAhistogram_20807369_ToroBarrenechea.rkt")
+(require "TDApixbi.rkt")
+(require "TDApixrgb.rkt")
+(require "TDApixhex.rkt")
+(require "TDAimage.rkt")
+(require "TDAhistogram.rkt")
 
 
 ; >-------------------------- FUNCION pixmap? bitmap? hexmap? --------------------------<

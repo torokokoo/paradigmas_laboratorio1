@@ -1,11 +1,11 @@
 #lang racket
 
-(require "TDApixbit_20807369_ToroBarrenechea.rkt")
-(require "TDApixrgb_20807369_ToroBarrenechea.rkt")
-(require "TDApixhex_20807369_ToroBarrenechea.rkt")
-(require "TDAimage_20807369_ToroBarrenechea.rkt")
-(require "main_20807369_ToroBarrenechea.rkt")
-(require "TDAhistogram_20807369_ToroBarrenechea.rkt")
+(require "TDApixbit.rkt")
+(require "TDApixrgb.rkt")
+(require "TDApixhex.rkt")
+(require "TDAimage.rkt")
+(require "main.rkt")
+(require "TDAhistogram.rkt")
 
 ; Datos para probar
 (define bit-image (image 2 2 (pixbit-d 1 1 0 0) (pixbit-d 1 2 1 0) (pixbit-d 2 1 0 1) (pixbit-d 2 2 1 1)))
